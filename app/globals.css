@@ -3,6 +3,8 @@
    Dark · Glass · Neon Fire Theme
    ============================================ */
 
+   
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -29,6 +31,21 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  background-color: #080a0e !important;
+}
+
+* {
+  box-sizing: border-box !important;
+}
 * {
   margin: 0;
   padding: 0;
@@ -96,6 +113,8 @@ img {
 .hidden { display: none; }
 
 .btn {
+
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1636,4 +1655,23 @@ body {
 .hero > .container {
   position: relative !important;
   z-index: 5 !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important; /* Yahan 100vw ki jagah 100% karna hai */
+  min-height: 100vh !important;
+  background-color: #080a0e !important;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+*, *:before, *:after {
+  box-sizing: border-box !important;
 }

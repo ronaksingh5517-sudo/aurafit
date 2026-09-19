@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -21,7 +22,7 @@ import FloatingCoachButton from "@/components/FloatingCoachButton";
 import BodyScanView from "@/components/BodyScanView";
 import ToastNotification from "@/components/ToastNotification";
 import CheckoutView from "@/components/CheckoutView";
-import SettingsView from "@/components/SettingsView"; // <-- ADDED
+import SettingsView from "@/components/SettingsView";
 
 export default function DynamicPage() {
   const rawPathname = usePathname() || "/";
@@ -33,6 +34,20 @@ export default function DynamicPage() {
     .replace(".js", "") || "/";
 
   const router = useRouter();
+  const [isOnboarded, setIsOnboarded] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    // Check karo kya user ne onboarding poori ki hai ya nahi
+    const savedUser = localStorage.getItem("aurafit_user");
+    if (!savedUser && cleanPath !== "/onboarding" && cleanPath !== "/login" && cleanPath !== "/signup" && cleanPath !== "/") {
+      setIsOnboarded(false);
+      router.push("/onboarding"); // Agar data nahi hai toh forced onboarding par bhejo
+    } else {
+      setIsOnboarded(true);
+    }
+    setCheckingAuth(false);
+  }, [cleanPath, router]);
 
   const handlePageClick = (e) => {
     const link = e.target.closest("a");
@@ -112,7 +127,6 @@ export default function DynamicPage() {
       return <CheckoutView />;
     }
 
-    // Settings Route (Ready!)
     if (cleanPath === "/settings" || cleanPath === "/settingsview") {
       return <SettingsView />;
     }
@@ -183,11 +197,41 @@ export default function DynamicPage() {
     );
   };
 
+  if (checkingAuth) return null;
+
   return (
-    <main onClick={handlePageClick}>
+    <main onClick={handlePageClick} className="main-wrapper">
       <ToastNotification />
       {renderContent()}
       <FloatingCoachButton />
+
+   <style jsx global>{`
+        /* CLEAN GLOBAL RESET: Scrollbar aur gap ki problem hamesha ke liye khatam */
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          min-height: 100vh !important;
+          background-color: #080a0e !important;
+          overflow-x: hidden !important;
+        }
+        *, *:before, *:after {
+          box-sizing: border-box !important;
+        }
+      `}</style>
+
+      <style jsx>{`
+        .main-wrapper {
+          position: relative;
+          width: 100%;
+          min-height: 100vh;
+          margin: 0;
+          padding: 0;
+          background-color: #080a0e;
+          box-sizing: border-box;
+          overflow-x: hidden;
+        }
+      `}</style>
     </main>
   );
 }

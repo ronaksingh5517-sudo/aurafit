@@ -19,6 +19,7 @@ export async function POST(req) {
     const db = client.db("aurafit");
 
     const user = await db.collection("users").findOne({ email: email.toLowerCase() });
+    
     if (!user || !user.password || !user.salt) {
       return NextResponse.json({ success: false, error: "Invalid email or password" }, { status: 401 });
     }
@@ -31,11 +32,8 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       user: {
-        userId: user.userId,
-        name: user.name,
         email: user.email,
-        goal: user.goal,
-        dailyCalories: user.dailyCalories,
+        name: user.name,
       },
     });
   } catch (error) {

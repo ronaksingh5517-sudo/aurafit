@@ -1,8 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Fit30Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -12,7 +17,13 @@ export default function Fit30Dashboard() {
   const [timerSeconds, setTimerSeconds] = useState(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-  const userId = "user_1788771654076";
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  const userId = session?.user?.email || "user_1788771654076";
 
   const fetchProgram = async (action = null, dayNumber = null) => {
     try {
@@ -43,8 +54,10 @@ export default function Fit30Dashboard() {
   };
 
   useEffect(() => {
-    fetchProgram();
-  }, []);
+    if (status === "authenticated") {
+      fetchProgram();
+    }
+  }, [status]);
 
   useEffect(() => {
     let interval = null;
@@ -80,12 +93,16 @@ export default function Fit30Dashboard() {
     setCompletedSets({});
   };
 
-  if (loading && !program) {
+  if (status === "loading" || (loading && !program)) {
     return (
       <div style={{ minHeight: "100vh", background: "#05070b", color: "#fff", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: "system-ui, sans-serif" }}>
-        <p style={{ fontSize: "16px", color: "#38bdf8" }}>Loading FIT30 Transformation Engine...</p>
+        <p style={{ fontSize: "16px", color: "#38bdf8" }}>Authenticating & Loading FIT30 Engine...</p>
       </div>
     );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
@@ -97,7 +114,10 @@ export default function Fit30Dashboard() {
             <span style={{ background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", padding: "4px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>FIT30 Program Engine</span>
             <h1 style={{ fontSize: "26px", fontWeight: 800, color: "#fff", marginTop: "6px" }}>{program?.programName || "30-Day Transformation"}</h1>
           </div>
-          <a href="/dashboard" style={{ background: "rgba(255,255,255,0.05)", color: "#94a3b8", padding: "8px 16px", borderRadius: "8px", textDecoration: "none", fontSize: "13px", fontWeight: 600, border: "1px solid rgba(255,255,255,0.1)" }}>← Dashboard</a>
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <span style={{ fontSize: "13px", color: "#94a3b8" }}>👤 {session.user?.name || session.user?.email}</span>
+            <a href="/login" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", padding: "8px 14px", borderRadius: "8px", textDecoration: "none", fontSize: "13px", fontWeight: 600, border: "1px solid rgba(239,68,68,0.2)" }}>Logout</a>
+          </div>
         </div>
 
         {program?.stats && (
